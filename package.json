@@ -1,6 +1,9 @@
 {
   "name": "vendorbridge-backend",
   "version": "1.0.0",
+  "prisma": {
+  "seed": "ts-node prisma/seed.ts"
+},
   "description": "VendorBridge Procurement Management System Backend",
   "main": "dist/index.js",
   "scripts": {
