@@ -1,0 +1,34 @@
+{
+  "recommend_vendors_payload": {
+    "rfq_id": "rfq-001",
+    "category": "Furniture",
+    "budget_estimate": 500000,
+    "deadline_days": 15,
+    "vendors": [
+      { "vendor_id": "v001", "vendor_name": "FurniCo",    "category": "Furniture", "avg_rating": 4.7, "avg_price": 8500, "avg_delivery_days": 10, "total_pos": 42 },
+      { "vendor_id": "v002", "vendor_name": "OfficeWorld", "category": "Furniture", "avg_rating": 4.3, "avg_price": 9200, "avg_delivery_days": 8,  "total_pos": 35 },
+      { "vendor_id": "v003", "vendor_name": "DeskMart",   "category": "Furniture", "avg_rating": 3.9, "avg_price": 7800, "avg_delivery_days": 14, "total_pos": 20 },
+      { "vendor_id": "v009", "vendor_name": "ErgoPro",    "category": "Furniture", "avg_rating": 4.5, "avg_price": 8800, "avg_delivery_days": 9,  "total_pos": 30 }
+    ]
+  },
+
+  "rank_quotations_payload": {
+    "rfq_id": "rfq-001",
+    "quotations": [
+      { "id": "q001", "vendor_id": "v001", "vendor_name": "FurniCo",    "unit_price": 8500, "delivery_days": 12, "vendor_rating": 4.7 },
+      { "id": "q002", "vendor_id": "v002", "vendor_name": "OfficeWorld", "unit_price": 9200, "delivery_days": 8,  "vendor_rating": 4.3 },
+      { "id": "q003", "vendor_id": "v003", "vendor_name": "DeskMart",   "unit_price": 7800, "delivery_days": 15, "vendor_rating": 3.9 }
+    ]
+  },
+
+  "spend_forecast_payload": {
+    "monthly_spend": [
+      { "month": "2025-12", "amount": 320000 },
+      { "month": "2026-01", "amount": 380000 },
+      { "month": "2026-02", "amount": 410000 },
+      { "month": "2026-03", "amount": 390000 },
+      { "month": "2026-04", "amount": 450000 },
+      { "month": "2026-05", "amount": 480000 }
+    ]
+  }
+}
