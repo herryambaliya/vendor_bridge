@@ -50,8 +50,36 @@ app.get('/health', (_req, res) => {
 
 const PORT = process.env.PORT ?? 5000;
 
-app.listen(PORT, () => {
+import { PrismaClient } from '@prisma/client';
+const prismaClient = new PrismaClient();
+
+async function fixVendorUserLinks() {
+  try {
+    const vendorUser = await prismaClient.user.findFirst({
+      where: { role: 'vendor', email: 'vendor@furnico.com' },
+    });
+    if (vendorUser) {
+      const vendor = await prismaClient.vendor.findFirst({
+        where: { email: 'vendor@furnico.com' },
+      });
+      if (vendor && !vendor.user_id) {
+        await prismaClient.vendor.update({
+          where: { id: vendor.id },
+          data: { user_id: vendorUser.id },
+        });
+        console.log('🔗 Automatically linked vendor@furnico.com user to FurniCo vendor profile.');
+      }
+    }
+  } catch (err) {
+    console.error('Error auto-linking vendor user:', err);
+  } finally {
+    await prismaClient.$disconnect();
+  }
+}
+
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  await fixVendorUserLinks();
 });
 
 export default app;

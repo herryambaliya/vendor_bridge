@@ -215,7 +215,7 @@ export const RFQs: React.FC = () => {
     queryFn: () => api.rfqs.list(statusFilter)
   });
 
-  const isOfficer = user?.role === 'procurement_officer';
+  const isOfficer = user?.role === 'procurement_officer' || user?.role === 'officer';
 
   const filteredRfqs = rfqs ? rfqs.filter(r =>
     r.title.toLowerCase().includes(search.toLowerCase()) ||

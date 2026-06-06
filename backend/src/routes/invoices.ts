@@ -88,6 +88,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       orderBy: { created_at: 'desc' },
       include: {
         vendor: { select: { id: true, name: true, email: true } },
+        purchase_order: { select: { id: true, po_number: true, total_amount: true } },
       },
     });
 

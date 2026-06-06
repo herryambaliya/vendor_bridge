@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 const signupSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional().default('Password@123'),
   role: z.enum(['admin', 'officer', 'manager', 'vendor']),
 });
 
@@ -56,6 +56,21 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
       data: { name, email, password: hashedPassword, role },
     });
 
+    let vendorId: string | undefined = undefined;
+    if (user.role === 'vendor') {
+      const vendor = await prisma.vendor.findFirst({
+        where: {
+          OR: [
+            { user_id: user.id },
+            { email: user.email },
+          ],
+        },
+      });
+      if (vendor) {
+        vendorId = vendor.id;
+      }
+    }
+
     // Sign JWT
     const token = signToken(user.id, user.role);
 
@@ -66,6 +81,7 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
         name: user.name,
         email: user.email,
         role: user.role,
+        vendorId,
       },
     });
   } catch (e) {
@@ -102,6 +118,21 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     // Sign JWT
     const token = signToken(user.id, user.role);
 
+    let vendorId: string | undefined = undefined;
+    if (user.role === 'vendor') {
+      const vendor = await prisma.vendor.findFirst({
+        where: {
+          OR: [
+            { user_id: user.id },
+            { email: user.email },
+          ],
+        },
+      });
+      if (vendor) {
+        vendorId = vendor.id;
+      }
+    }
+
     res.status(200).json({
       token,
       user: {
@@ -109,6 +140,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
         name: user.name,
         email: user.email,
         role: user.role,
+        vendorId,
       },
     });
   } catch (e) {

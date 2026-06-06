@@ -21,7 +21,7 @@ CREATE TYPE "InvoiceStatus" AS ENUM ('draft', 'sent', 'paid');
 
 -- CreateTable
 CREATE TABLE "users" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE "users" (
 
 -- CreateTable
 CREATE TABLE "vendors" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE "vendors" (
 
 -- CreateTable
 CREATE TABLE "rfqs" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "status" "RfqStatus" NOT NULL DEFAULT 'draft',
@@ -64,7 +64,7 @@ CREATE TABLE "rfqs" (
 
 -- CreateTable
 CREATE TABLE "rfq_items" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "rfq_id" UUID NOT NULL,
     "product_name" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE "rfq_items" (
 
 -- CreateTable
 CREATE TABLE "rfq_vendors" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "rfq_id" UUID NOT NULL,
     "vendor_id" UUID NOT NULL,
 
@@ -85,7 +85,7 @@ CREATE TABLE "rfq_vendors" (
 
 -- CreateTable
 CREATE TABLE "quotations" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "rfq_id" UUID NOT NULL,
     "vendor_id" UUID NOT NULL,
     "unit_price" DOUBLE PRECISION NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE "quotations" (
 
 -- CreateTable
 CREATE TABLE "purchase_orders" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "po_number" TEXT NOT NULL,
     "quotation_id" UUID NOT NULL,
     "vendor_id" UUID NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE "purchase_orders" (
 
 -- CreateTable
 CREATE TABLE "approvals" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "quotation_id" UUID NOT NULL,
     "requested_by" UUID NOT NULL,
     "approver_id" UUID NOT NULL,
@@ -130,12 +130,12 @@ CREATE TABLE "approvals" (
 
 -- CreateTable
 CREATE TABLE "invoices" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "invoice_number" TEXT NOT NULL,
     "po_id" UUID NOT NULL,
     "vendor_id" UUID NOT NULL,
-    "issued_date" DATE NOT NULL,
-    "due_date" DATE NOT NULL,
+    "issued_date" TIMESTAMP(3) NOT NULL,
+    "due_date" TIMESTAMP(3) NOT NULL,
     "status" "InvoiceStatus" NOT NULL DEFAULT 'draft',
     "emailed_at" TIMESTAMP(3),
     "pdf_url" TEXT,
@@ -146,7 +146,7 @@ CREATE TABLE "invoices" (
 
 -- CreateTable
 CREATE TABLE "activity_logs" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
     "entity_type" TEXT NOT NULL,
     "entity_id" TEXT NOT NULL,

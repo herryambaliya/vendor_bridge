@@ -102,7 +102,7 @@ export const RFQDetail: React.FC = () => {
     );
   }
 
-  const isOfficer = user?.role === 'procurement_officer';
+  const isOfficer = user?.role === 'procurement_officer' || user?.role === 'officer';
   const isVendor = user?.role === 'vendor';
 
   // Vendor permissions

@@ -123,7 +123,13 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
           quotation: {
             include: {
               vendor: { select: { id: true, name: true, category: true } },
-              rfq: { select: { id: true, title: true } },
+              rfq: {
+                select: {
+                  id: true,
+                  title: true,
+                  rfq_items: true,
+                },
+              },
             },
           },
           requester: { select: { id: true, name: true } },

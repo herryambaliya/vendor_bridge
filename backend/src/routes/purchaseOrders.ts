@@ -45,6 +45,11 @@ router.get(
         orderBy: { issued_at: 'desc' },
         include: {
           vendor: { select: { id: true, name: true, email: true } },
+          quotation: {
+            include: {
+              rfq: { select: { id: true, title: true } }
+            }
+          }
         },
       });
 

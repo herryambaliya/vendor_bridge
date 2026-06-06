@@ -106,6 +106,13 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       where,
       orderBy: { created_at: 'desc' },
       include: {
+        rfq_items: true,
+        rfq_vendors: true,
+        quotations: {
+          include: {
+            vendor: { select: { id: true, name: true } }
+          }
+        },
         _count: {
           select: {
             rfq_items: true,
@@ -160,6 +167,19 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
       include: {
         rfq_items: true,
         rfq_vendors: {
+          include: {
+            vendor: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                category: true,
+                status: true,
+              },
+            },
+          },
+        },
+        quotations: {
           include: {
             vendor: {
               select: {

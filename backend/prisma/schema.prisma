@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // Use an environment variable for the connection string. Assumption: DATABASE_URL will be set.
   url      = env("DATABASE_URL")
 }
 
@@ -55,7 +56,7 @@ enum InvoiceStatus {
 }
 
 model User {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   name       String
   email      String   @unique
   password   String
@@ -74,7 +75,7 @@ model User {
 }
 
 model Vendor {
-  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id         String       @id @default(uuid()) @db.Uuid
   name       String
   email      String
   phone      String
@@ -99,7 +100,7 @@ model Vendor {
 }
 
 model Rfq {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
   title       String
   description String
   status      RfqStatus @default(draft)
@@ -117,7 +118,7 @@ model Rfq {
 }
 
 model RfqItem {
-  id              String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id              String @id @default(uuid()) @db.Uuid
   rfq_id          String @db.Uuid
   product_name    String
   quantity        Int
@@ -131,7 +132,7 @@ model RfqItem {
 }
 
 model RfqVendor {
-  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id        String @id @default(uuid()) @db.Uuid
   rfq_id    String @db.Uuid
   vendor_id String @db.Uuid
 
@@ -143,7 +144,7 @@ model RfqVendor {
 }
 
 model Quotation {
-  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id            String          @id @default(uuid()) @db.Uuid
   rfq_id        String          @db.Uuid
   vendor_id     String          @db.Uuid
   unit_price    Float
@@ -162,7 +163,7 @@ model Quotation {
 }
 
 model PurchaseOrder {
-  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id            String              @id @default(uuid()) @db.Uuid
   po_number     String              @unique
   quotation_id  String              @db.Uuid
   vendor_id     String              @db.Uuid
@@ -183,7 +184,7 @@ model PurchaseOrder {
 }
 
 model Approval {
-  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id           String         @id @default(uuid()) @db.Uuid
   quotation_id String         @db.Uuid
   requested_by String         @db.Uuid
   approver_id  String         @db.Uuid
@@ -201,12 +202,13 @@ model Approval {
 }
 
 model Invoice {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id             String        @id @default(uuid()) @db.Uuid
   invoice_number String        @unique
   po_id          String        @db.Uuid
   vendor_id      String        @db.Uuid
-  issued_date    DateTime      @db.Date
-  due_date       DateTime      @db.Date
+  // Use plain DateTime; @db.Date is a native type and can cause migration issues.
+  issued_date    DateTime
+  due_date       DateTime
   status         InvoiceStatus @default(draft)
   emailed_at     DateTime?
   pdf_url        String?
@@ -220,7 +222,7 @@ model Invoice {
 }
 
 model ActivityLog {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   user_id     String   @db.Uuid
   entity_type String
   entity_id   String

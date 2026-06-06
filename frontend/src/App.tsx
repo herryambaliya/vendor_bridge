@@ -67,7 +67,7 @@ export const App: React.FC = () => {
         </Route>
 
         {/* Procurement Officer / Manager / Admin Authorized Routes */}
-        <Route element={<PrivateRoute allowedRoles={['procurement_officer', 'manager', 'admin']} />}>
+        <Route element={<PrivateRoute allowedRoles={['procurement_officer', 'officer', 'manager', 'admin']} />}>
           <Route path="/vendors" element={<Vendors />} />
           <Route path="/rfqs" element={<RFQs />} />
           <Route path="/rfqs/:id/compare" element={<QuotationComparison />} />
@@ -80,12 +80,12 @@ export const App: React.FC = () => {
         </Route>
 
         {/* Procurement Officer Only Routes */}
-        <Route element={<PrivateRoute allowedRoles={['procurement_officer']} />}>
+        <Route element={<PrivateRoute allowedRoles={['procurement_officer', 'officer']} />}>
           <Route path="/rfqs/new" element={<RFQCreate />} />
         </Route>
 
         {/* Approving Manager / Procurement Officer / Admin Routes */}
-        <Route element={<PrivateRoute allowedRoles={['manager', 'procurement_officer', 'admin']} />}>
+        <Route element={<PrivateRoute allowedRoles={['manager', 'procurement_officer', 'officer', 'admin']} />}>
           <Route path="/approvals" element={<Approvals />} />
         </Route>
 

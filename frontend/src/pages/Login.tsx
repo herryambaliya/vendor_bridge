@@ -34,7 +34,15 @@ export const Login: React.FC = () => {
   const handleDemoLogin = (email: string) => {
     setActiveDemo(email);
     setValue('email', email);
-    setValue('password_hash', 'Password@123');
+    
+    // Map email to correct seeded password
+    let password = 'Password@123';
+    if (email.startsWith('admin')) password = 'Admin@123';
+    else if (email.startsWith('officer')) password = 'Officer@123';
+    else if (email.startsWith('manager')) password = 'Manager@123';
+    else if (email.startsWith('vendor')) password = 'Vendor@123';
+    
+    setValue('password_hash', password);
     handleSubmit(onSubmit)();
   };
 

@@ -29,6 +29,8 @@ export const Sidebar: React.FC = () => {
 
   if (!user) return null;
 
+  const normalizedRole = user.role === 'officer' ? 'procurement_officer' : user.role;
+
   const roleLabels: Record<string, string> = {
     admin: 'Administrator',
     procurement_officer: 'Procurement Officer',
@@ -55,7 +57,7 @@ export const Sidebar: React.FC = () => {
       { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, accent: '#3b82f6', bg: 'rgba(59,130,246,0.08)' },
     ];
 
-    if (user.role === 'admin') {
+    if (normalizedRole === 'admin') {
       return [
         ...common,
         { to: '/vendors',       label: 'Vendor Registry', icon: Building2,    accent: '#6366f1', bg: 'rgba(99,102,241,0.08)' },
@@ -64,7 +66,7 @@ export const Sidebar: React.FC = () => {
       ];
     }
 
-    if (user.role === 'procurement_officer') {
+    if (normalizedRole === 'procurement_officer') {
       return [
         ...common,
         { to: '/vendors',         label: 'Vendors',         icon: Building2,    accent: '#6366f1', bg: 'rgba(99,102,241,0.08)' },
@@ -78,7 +80,7 @@ export const Sidebar: React.FC = () => {
       ];
     }
 
-    if (user.role === 'manager') {
+    if (normalizedRole === 'manager') {
       return [
         ...common,
         { to: '/approvals',       label: 'Approvals',       icon: CheckSquare,  accent: '#f59e0b', bg: 'rgba(245,158,11,0.08)' },
@@ -89,7 +91,7 @@ export const Sidebar: React.FC = () => {
       ];
     }
 
-    if (user.role === 'vendor') {
+    if (normalizedRole === 'vendor') {
       return [
         ...common,
         { to: '/my-rfqs',    label: 'Assigned RFQs', icon: FileText,   accent: '#8b5cf6', bg: 'rgba(139,92,246,0.08)' },
@@ -101,7 +103,7 @@ export const Sidebar: React.FC = () => {
   };
 
   const navLinks = getNavLinks();
-  const rg = roleGradients[user.role] || roleGradients.procurement_officer;
+  const rg = roleGradients[normalizedRole] || roleGradients.procurement_officer;
 
   return (
     <aside

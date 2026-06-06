@@ -47,7 +47,7 @@ export const Vendors: React.FC = () => {
     queryFn: () => api.vendors.list(search, statusFilter),
   });
 
-  const isEditable = user?.role === 'admin' || user?.role === 'procurement_officer';
+  const isEditable = user?.role === 'admin' || user?.role === 'procurement_officer' || user?.role === 'officer';
   const filteredVendors = vendors ?? [];
   const allCount = filteredVendors.length;
   const activeCount = filteredVendors.filter((v) => v.status === 'active').length;

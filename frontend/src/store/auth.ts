@@ -34,14 +34,18 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const result = await api.auth.login(email, password_hash);
+          const mappedUser = result.user ? {
+            ...result.user,
+            role: result.user.role === 'officer' ? 'procurement_officer' : result.user.role
+          } : null;
           set({
-            user: result.user,
+            user: mappedUser,
             token: result.token,
             isAuthenticated: true,
             isLoading: false,
             error: null
           });
-          return result.user;
+          return mappedUser;
         } catch (err: any) {
           const errMsg = err?.response?.data?.message || err?.message || 'Invalid credentials';
           set({ error: errMsg, isLoading: false, isAuthenticated: false });
