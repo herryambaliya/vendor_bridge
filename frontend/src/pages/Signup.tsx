@@ -29,7 +29,7 @@ export const Signup: React.FC = () => {
     try {
       const fullName = `${data.firstName} ${data.lastName}`.trim();
       await api.auth.signup(fullName, data.email, data.role);
-      showToast.success('Account registered successfully! Please sign in.');
+      showToast.success('Account registered successfully! Please sign in using the default password: Password@123');
       navigate('/login');
     } catch (err: any) {
       const data = err?.response?.data;
