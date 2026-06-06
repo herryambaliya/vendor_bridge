@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment variables - NEVER commit this
+.env
+
+# Build output
+dist/
+
+# Generated files
+generated-invoices/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

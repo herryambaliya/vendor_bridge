@@ -1,0 +1,235 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  officer
+  manager
+  vendor
+}
+
+enum VendorStatus {
+  active
+  inactive
+  blacklisted
+}
+
+enum RfqStatus {
+  draft
+  open
+  closed
+  cancelled
+}
+
+enum QuotationStatus {
+  submitted
+  shortlisted
+  rejected
+}
+
+enum PurchaseOrderStatus {
+  issued
+  acknowledged
+  delivered
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+enum InvoiceStatus {
+  draft
+  sent
+  paid
+}
+
+model User {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  email      String   @unique
+  password   String
+  role       Role
+  created_at DateTime @default(now())
+
+  // Relations
+  vendors        Vendor[]   @relation("CreatedVendors")
+  vendor_profile Vendor?    @relation("VendorUser")
+  rfqs           Rfq[]
+  approvals_req  Approval[] @relation("RequestedBy")
+  approvals_done Approval[] @relation("ApprovedBy")
+  activity_logs  ActivityLog[]
+
+  @@map("users")
+}
+
+model Vendor {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  email      String
+  phone      String
+  address    String
+  gst_number String
+  category   String
+  status     VendorStatus @default(active)
+  rating     Float        @default(0)
+  created_by String       @db.Uuid
+  user_id    String?      @unique @db.Uuid
+  created_at DateTime     @default(now())
+
+  // Relations
+  creator         User            @relation("CreatedVendors", fields: [created_by], references: [id])
+  user            User?           @relation("VendorUser", fields: [user_id], references: [id])
+  rfq_vendors     RfqVendor[]
+  quotations      Quotation[]
+  purchase_orders PurchaseOrder[]
+  invoices        Invoice[]
+
+  @@map("vendors")
+}
+
+model Rfq {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String
+  status      RfqStatus @default(draft)
+  deadline    DateTime
+  created_by  String    @db.Uuid
+  created_at  DateTime  @default(now())
+
+  // Relations
+  creator     User        @relation(fields: [created_by], references: [id])
+  rfq_items   RfqItem[]
+  rfq_vendors RfqVendor[]
+  quotations  Quotation[]
+
+  @@map("rfqs")
+}
+
+model RfqItem {
+  id              String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rfq_id          String @db.Uuid
+  product_name    String
+  quantity        Int
+  unit            String
+  estimated_price Float
+
+  // Relations
+  rfq Rfq @relation(fields: [rfq_id], references: [id], onDelete: Cascade)
+
+  @@map("rfq_items")
+}
+
+model RfqVendor {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rfq_id    String @db.Uuid
+  vendor_id String @db.Uuid
+
+  // Relations
+  rfq    Rfq    @relation(fields: [rfq_id], references: [id], onDelete: Cascade)
+  vendor Vendor @relation(fields: [vendor_id], references: [id])
+
+  @@map("rfq_vendors")
+}
+
+model Quotation {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rfq_id        String          @db.Uuid
+  vendor_id     String          @db.Uuid
+  unit_price    Float
+  delivery_days Int
+  notes         String?
+  status        QuotationStatus @default(submitted)
+  created_at    DateTime        @default(now())
+
+  // Relations
+  rfq            Rfq             @relation(fields: [rfq_id], references: [id])
+  vendor         Vendor          @relation(fields: [vendor_id], references: [id])
+  purchase_orders PurchaseOrder[]
+  approvals      Approval[]
+
+  @@map("quotations")
+}
+
+model PurchaseOrder {
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  po_number     String              @unique
+  quotation_id  String              @db.Uuid
+  vendor_id     String              @db.Uuid
+  subtotal      Float
+  tax_percent   Float               @default(18)
+  tax_amount    Float
+  total_amount  Float
+  status        PurchaseOrderStatus @default(issued)
+  issued_at     DateTime            @default(now())
+  pdf_url       String?
+
+  // Relations
+  quotation Quotation @relation(fields: [quotation_id], references: [id])
+  vendor    Vendor    @relation(fields: [vendor_id], references: [id])
+  invoices  Invoice[]
+
+  @@map("purchase_orders")
+}
+
+model Approval {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quotation_id String         @db.Uuid
+  requested_by String         @db.Uuid
+  approver_id  String         @db.Uuid
+  status       ApprovalStatus @default(pending)
+  remarks      String?
+  actioned_at  DateTime?
+  created_at   DateTime       @default(now())
+
+  // Relations
+  quotation  Quotation @relation(fields: [quotation_id], references: [id])
+  requester  User      @relation("RequestedBy", fields: [requested_by], references: [id])
+  approver   User      @relation("ApprovedBy", fields: [approver_id], references: [id])
+
+  @@map("approvals")
+}
+
+model Invoice {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoice_number String        @unique
+  po_id          String        @db.Uuid
+  vendor_id      String        @db.Uuid
+  issued_date    DateTime      @db.Date
+  due_date       DateTime      @db.Date
+  status         InvoiceStatus @default(draft)
+  emailed_at     DateTime?
+  pdf_url        String?
+  created_at     DateTime      @default(now())
+
+  // Relations
+  purchase_order PurchaseOrder @relation(fields: [po_id], references: [id])
+  vendor         Vendor        @relation(fields: [vendor_id], references: [id])
+
+  @@map("invoices")
+}
+
+model ActivityLog {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid
+  entity_type String
+  entity_id   String
+  action      String
+  metadata    Json?
+  created_at  DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("activity_logs")
+}
