@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-pydantic
-numpy
-scikit-learn
-pandas
-python-dateutil
-python-dotenv
-httpx
