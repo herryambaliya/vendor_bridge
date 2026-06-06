@@ -7,11 +7,11 @@ const prisma = new PrismaClient();
 // ─── Nodemailer Transporter ──────────────────────────────────────────────────
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT ?? '2525', 10),
+  host: process.env.EMAIL_HOST || 'smtp.ethereal.email',
+  port: parseInt(process.env.EMAIL_PORT ?? '587', 10),
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -21,8 +21,9 @@ const transporter = nodemailer.createTransport({
  * Generates an invoice PDF and emails it to the vendor.
  *
  * @param invoiceId - The UUID of the invoice to send
+ * @param registeredUserEmail - Optional email address of the registered user to receive a copy
  */
-export async function sendInvoiceEmail(invoiceId: string): Promise<void> {
+export async function sendInvoiceEmail(invoiceId: string, registeredUserEmail?: string): Promise<void> {
   // Fetch invoice with vendor + purchase_order (for total_amount)
   const invoice = await prisma.invoice.findUnique({
     where: { id: invoiceId },
@@ -46,9 +47,21 @@ export async function sendInvoiceEmail(invoiceId: string): Promise<void> {
     year: 'numeric',
   });
 
+  const recipients = new Set<string>();
+  if (vendor.email) {
+    recipients.add(vendor.email.trim());
+  }
+  if (registeredUserEmail) {
+    recipients.add(registeredUserEmail.trim());
+  }
+
+  if (recipients.size === 0) {
+    throw new Error(`No recipient email address available for invoice ${invoiceId}`);
+  }
+
   await transporter.sendMail({
-    from: '"VendorBridge" <noreply@vendorbridge.com>',
-    to: vendor.email,
+    from: process.env.EMAIL_FROM || '"VendorBridge" <noreply@vendorbridge.com>',
+    to: Array.from(recipients).join(', '),
     subject: `Invoice ${invoice.invoice_number} from VendorBridge`,
     text: [
       `Dear ${vendor.name},`,

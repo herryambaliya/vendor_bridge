@@ -181,8 +181,13 @@ router.post('/:id/send-email', async (req: Request, res: Response): Promise<void
       return;
     }
 
-    // Send email with PDF attachment
-    await sendInvoiceEmail(id);
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    // Send email with PDF attachment to vendor and registered user
+    await sendInvoiceEmail(id, user?.email);
 
     // Update emailed_at and status
     await prisma.invoice.update({
