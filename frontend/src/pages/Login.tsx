@@ -27,7 +27,9 @@ export const Login: React.FC = () => {
         navigate('/dashboard');
       }
     } catch (err: any) {
-      showToast.error(err?.response?.data?.message || err?.message || 'Login failed');
+      const data = err?.response?.data;
+      const errMsg = typeof data?.error === 'string' ? data.error : data?.message || err?.message || 'Login failed';
+      showToast.error(errMsg);
     }
   };
 

@@ -32,7 +32,21 @@ export const Signup: React.FC = () => {
       showToast.success('Account registered successfully! Please sign in.');
       navigate('/login');
     } catch (err: any) {
-      const errMsg = err?.response?.data?.message || err?.message || 'Registration failed';
+      const data = err?.response?.data;
+      let errMsg = 'Registration failed';
+      if (data) {
+        if (typeof data.error === 'string') {
+          errMsg = data.error;
+        } else if (data.error && typeof data.error === 'object') {
+          errMsg = Object.entries(data.error)
+            .map(([field, msgs]: any) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+            .join(' | ');
+        } else if (data.message) {
+          errMsg = data.message;
+        }
+      } else {
+        errMsg = err?.message || errMsg;
+      }
       setError(errMsg);
       showToast.error(errMsg);
     } finally {
